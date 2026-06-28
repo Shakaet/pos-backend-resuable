@@ -191,31 +191,48 @@ const storage = new CloudinaryStorage({
 
 const ImageUpload = multer({
   storage,
-  limits: { fileSize: 200 * 1024 * 1024 }, // 200MB
+  limits: { fileSize: 200 * 1024 * 1024 },
 });
 
-/* ================= UPLOAD ================= */
+/* ================= SINGLE UPLOAD ================= */
 const uploadToSpaces = async (file: Express.Multer.File) => {
   if (!file) throw new ApiError(400, "File not found");
-
-  // multer-storage-cloudinary automatically uploads
-  // file.path = cloudinary URL
-  // file.filename = public_id
   return {
-    Location: file.path, // Cloudinary URL
-    Key: file.filename, // public_id (delete এর জন্য)
+    Location: file.path,
+    Key: file.filename,
   };
 };
 
-/* ================= DELETE ================= */
-const deleteFromSpaces = async (key: string) => {
+/* ================= MULTIPLE UPLOAD ================= */
+const uploadMultipleToSpaces = async (files: Express.Multer.File[]) => {
+  if (!files || files.length === 0) throw new ApiError(400, "Files not found");
+
+  return files.map((file) => ({
+    Location: file.path,
+    Key: file.filename,
+  }));
+};
+
+/* ================= SINGLE DELETE ================= */
+const deleteFromSpaces = async (key: string, resource_type: "image" | "video" = "image") => {
   if (!key) return;
 
-  const result = await cloudinary.uploader.destroy(key, {
-    resource_type: "image", // video হলে "video" দিন
-  });
-
+  const result = await cloudinary.uploader.destroy(key, { resource_type });
   if (result.result !== "ok") throw new ApiError(400, "Delete failed");
+
+  return true;
+};
+
+/* ================= MULTIPLE DELETE ================= */
+const deleteMultipleFromSpaces = async (keys: string[], resource_type: "image" | "video" = "image") => {
+  if (!keys || keys.length === 0) return;
+
+  const results = await Promise.allSettled(
+    keys.map((key) => cloudinary.uploader.destroy(key, { resource_type }))
+  );
+
+  const failed = results.filter((r) => r.status === "rejected");
+  if (failed.length > 0) throw new ApiError(400, "Some files failed to delete");
 
   return true;
 };
@@ -224,5 +241,7 @@ const deleteFromSpaces = async (key: string) => {
 export const FileUploadHelper = {
   ImageUpload,
   uploadToSpaces,
+  uploadMultipleToSpaces,
   deleteFromSpaces,
+  deleteMultipleFromSpaces,
 };
