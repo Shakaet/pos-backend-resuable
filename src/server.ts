@@ -5,8 +5,8 @@ dotenv.config();
 
 const mongoose = require("mongoose");
 
-// const uri = `mongodb://remotdb_aladinuser:DP6Pxn82B8@153.92.4.52:27017/remotdb_aladindb?replicaSet=rs0&authSource=admin`;
-const uri = `mongodb://remotdb_aladindevuser:DFLPxn82B8@153.92.4.52:27017/remotdb_aladindevdb?replicaSet=rs0&authSource=admin`;
+const uri = `mongodb://reuse:1nDZJP4BP3NlMi1g@cluster0-shard-00-00.bnqcs.mongodb.net:27017,cluster0-shard-00-01.bnqcs.mongodb.net:27017,cluster0-shard-00-02.bnqcs.mongodb.net:27017/reuse_db?ssl=true&replicaSet=atlas-vi1kvm-shard-0&authSource=admin&appName=Cluster0`;
+// const uri = `mongodb://remotdb_aladindevuser:DFLPxn82B8@153.92.4.52:27017/remotdb_aladindevdb?replicaSet=rs0&authSource=admin`;
 
 process.on("unhandledRejection", (reason: any) => {
   errorlogger.error(
