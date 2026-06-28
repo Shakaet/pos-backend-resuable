@@ -176,7 +176,7 @@ const storage = new CloudinaryStorage({
   params: async (_req, file) => {
     const isVideo = file.mimetype.startsWith("video/");
     return {
-      folder: "aladin_image",
+      folder: "reuse_backend_image",
       resource_type: isVideo ? "video" : "image",
       format: isVideo ? "mp4" : "webp",
       transformation: isVideo
