@@ -4,7 +4,11 @@ import { FileUploadHelper } from "../../helpers/image.upload";
 import { IBanner } from "./banner.interface";
 import { Banner } from "./banner.model";
 
-const createBanner = async (file: any): Promise<IBanner> => {
+
+
+export const BannerService = {
+
+  createBanner : async (file: any): Promise<IBanner> => {
   if (!file) throw new ApiError(400, "Banner image is required");
 
   const uploaded = await FileUploadHelper.uploadToSpaces(file);
@@ -16,19 +20,19 @@ const createBanner = async (file: any): Promise<IBanner> => {
   });
 
   return banner;
-};
+},
 
-const getAllBanners = async (): Promise<IBanner[]> => {
+getAllBanners : async (): Promise<IBanner[]> => {
   return await Banner.find().sort({ createdAt: -1 });
-};
+},
 
-const getSingleBanner = async (id: string): Promise<IBanner> => {
+getSingleBanner : async (id: string): Promise<IBanner> => {
   const banner = await Banner.findById(id);
   if (!banner) throw new ApiError(404, "Banner not found");
   return banner;
-};
+},
 
-const updateBanner = async (
+updateBanner : async (
   id: string,
   file?: Express.Multer.File,
   payload?: Partial<IBanner>
@@ -50,17 +54,17 @@ const updateBanner = async (
 
   const updated = await Banner.findByIdAndUpdate(id, updateData, { new: true });
   return updated!;
-};
+},
 
-const deleteBanner = async (id: string): Promise<void> => {
+deleteBanner : async (id: string): Promise<void> => {
   const existing = await Banner.findById(id);
   if (!existing) throw new ApiError(404, "Banner not found");
 
   await FileUploadHelper.deleteFromSpaces(existing.banner_image_key);
   await Banner.findByIdAndDelete(id);
-};
+},
 
-const toggleStatus = async (id: string): Promise<IBanner> => {
+ toggleStatus : async (id: string): Promise<IBanner> => {
   const existing = await Banner.findById(id);
   if (!existing) throw new ApiError(404, "Banner not found");
 
@@ -70,13 +74,6 @@ const toggleStatus = async (id: string): Promise<IBanner> => {
     { new: true }
   );
   return updated!;
-};
+},
 
-export const BannerService = {
-  createBanner,
-  getAllBanners,
-  getSingleBanner,
-  updateBanner,
-  deleteBanner,
-  toggleStatus,
 };
